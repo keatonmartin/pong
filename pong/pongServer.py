@@ -10,21 +10,46 @@ import threading
 
 HOST = "localhost"
 PORT = 12321
-MAX_CONNS = 10 # should probably be even 
+MAX_CONNS = 10 # maximum number of connections supported, should be even probably
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+# number of seconds to wait before timing out on a blocking operation on a socket, i.e. read/write
+TIMEOUT = 20
+
 def handleGame(c1: socket.socket, c2: socket.socket) -> None:
+    # set timeouts on sockets
+    c1.settimeout(TIMEOUT)
+    c2.settimeout(TIMEOUT)
+
     # send paddle identities to clients
     c1.send(f"left {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode()) 
     c2.send(f"right {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
     
     # start game
     while True:
-        c1state = c1.recv(1024).decode()
-        c2state = c2.recv(1024).decode()
-        # receive paddle direction, ball location, and current score from clients
+        try:
+
+            # exchange paddle, score, and ball information
+            c1state = c1.recv(1024).decode()
+            c2state = c2.recv(1024).decode()
+
+            c1.send(c2state.encode())
+            c2.send(c1state.encode())
+
+            # exchange tick number to synchronize client
+            #c1sync = int(c1.recv(1024).decode())
+            #c2sync = int(c2.recv(1024).decode())
+            
+            #c1.send(c2sync)
+            #c2.send(c1sync)
+
+        except socket.timeout:
+            print("Socket timed out; quitting game.")
+            break
+    
+    # close client connections
     c1.close()
     c2.close()
 
