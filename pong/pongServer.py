@@ -18,6 +18,10 @@ SCREEN_HEIGHT = 480
 # number of seconds to wait before timing out on a blocking operation on a socket, i.e. read/write
 TIMEOUT = 20
 
+# Author: Keaton Martin
+# Purpose: handleGame facilitates the exchange of game information between two clients playing together
+# Pre: handleGame expects two live users at the end of sockets c1 and c2
+# Post: After handleGame finishes, the socket connections to c1 and c2 are closed. 
 def handleGame(c1: socket.socket, c2: socket.socket) -> None:
     # set timeouts on sockets
     c1.settimeout(TIMEOUT)
@@ -38,17 +42,9 @@ def handleGame(c1: socket.socket, c2: socket.socket) -> None:
             c1.send(c2state.encode())
             c2.send(c1state.encode())
 
-            # exchange tick number to synchronize client
-            #c1sync = int(c1.recv(1024).decode())
-            #c2sync = int(c2.recv(1024).decode())
-            
-            #c1.send(c2sync)
-            #c2.send(c1sync)
-
-        except socket.timeout:
+       except socket.timeout:
             print("Socket timed out; quitting game.")
             break
-    
     # close client connections
     c1.close()
     c2.close()
