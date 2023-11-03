@@ -1,9 +1,8 @@
 # =================================================================================================
-# Contributing Authors:	    <Anyone who touched the code>
-# Email Addresses:          <Your uky.edu email addresses>
-# Date:                     <The date the file was last edited>
-# Purpose:                  <How this file contributes to the project>
-# Misc:                     <Not Required.  Anything else you might want to include>
+# Contributing Authors:	    Lucy Estep, Kyra Gegner
+# Email Addresses:          ljes223@uky.edu kmge
+# Date:                     11-3-23
+# Purpose:                  The client portion of the pong project
 # =================================================================================================
 
 import pygame
