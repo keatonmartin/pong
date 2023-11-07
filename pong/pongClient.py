@@ -1,7 +1,7 @@
 # =================================================================================================
 # Contributing Authors:	    Lucy Estep, Kyra Gegner
-# Email Addresses:          ljes223@uky.edu kmge
-# Date:                     11-3-23
+# Email Addresses:          ljes223@uky.edu kmge230@uky.edu
+# Date:                     11-7-23
 # Purpose:                  The client portion of the pong project
 # =================================================================================================
 
@@ -82,9 +82,9 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # Your code here to send an update to the server on your paddle's information,
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
-        
-        
         # =========================================================================================
+        update_data = f"paddle:{playerPaddle}, ball:{ball.rect.x}, {ball.rect.y}, score:{lScore},{rScore}"
+        client.send(update_data.encode())
 
         # Update the player paddle and opponent paddle's location on the screen
         for paddle in [playerPaddleObj, opponentPaddleObj]:
@@ -177,7 +177,17 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Get the required information from your server (screen width, height & player paddle, "left or "right)
-
+    try:
+        client.connect((ip, int(port)))
+        server_response = client.recv(1024).decode()
+        screenWidth, screenHeight, playerPaddle = server_response.split(',')
+        screenWidth = int(screenWidth)
+        screenHeight = int(screenHeight)
+        client.send(playerPaddle.encode())
+    except Exception as e:
+        errorLabel.config(text = f"Error: {e}")
+        client.close()
+        return
 
     # If you have messages you'd like to show the user use the errorLabel widget like so
     errorLabel.config(text=f"Some update text. You input: IP: {ip}, Port: {port}")
@@ -185,9 +195,9 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     errorLabel.update()     
 
     # Close this window and start the game with the info passed to you from the server
-    #app.withdraw()     # Hides the window (we'll kill it later)
-    #playGame(screenWidth, screenHeight, ("left"|"right"), client)  # User will be either left or right paddle
-    #app.quit()         # Kills the window
+    app.withdraw()     # Hides the window (we'll kill it later)
+    playGame(screenWidth, screenHeight, ("left"|"right"), client)  # User will be either left or right paddle
+    app.quit()         # Kills the window
 
 
 # This displays the opening screen, you don't need to edit this (but may if you like)
