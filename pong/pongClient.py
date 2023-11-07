@@ -180,10 +180,9 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     try:
         client.connect((ip, int(port)))
         server_response = client.recv(1024).decode()
-        screenWidth, screenHeight, playerPaddle = server_response.split(',')
+        playerPaddle, screenWidth, screenHeight = server_response.split(' ')
         screenWidth = int(screenWidth)
         screenHeight = int(screenHeight)
-        client.send(playerPaddle.encode())
     except Exception as e:
         errorLabel.config(text = f"Error: {e}")
         client.close()
