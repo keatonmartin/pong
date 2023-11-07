@@ -86,6 +86,12 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         update_data = f"paddle:{playerPaddle}, ball:{ball.rect.x}, {ball.rect.y}, score:{lScore},{rScore}"
         client.send(update_data.encode())
 
+        # receive opponent paddle's information
+        opponent_data = client.recv(1024).decode()
+        if opponent_data.startswith("paddle"):
+            _, opponent_paddle_pos = opponent_data.split(',')
+            opponentPaddleObj.rect.y = int(opponent_paddle_pos)
+
         # Update the player paddle and opponent paddle's location on the screen
         for paddle in [playerPaddleObj, opponentPaddleObj]:
             if paddle.moving == "down":
@@ -198,6 +204,7 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     playGame(screenWidth, screenHeight, ("left"|"right"), client)  # User will be either left or right paddle
     app.quit()         # Kills the window
 
+    playGame(screenWidth, screenHeight, playerPaddle, client)
 
 # This displays the opening screen, you don't need to edit this (but may if you like)
 def startScreen():
