@@ -58,7 +58,8 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
     rScore = 0
 
     sync = 0
-
+    playerPaddleObj.moving = "none"
+    
     while True:
         # Wiping the screen
         screen.fill((0,0,0))
@@ -76,7 +77,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
                     playerPaddleObj.moving = "up"
 
             elif event.type == pygame.KEYUP:
-                playerPaddleObj.moving = ""
+                playerPaddleObj.moving = "none"
 
         # =========================================================================================
         # Your code here to send an update to the server on your paddle's information,
