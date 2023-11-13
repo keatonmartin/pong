@@ -3,9 +3,9 @@ Contact Info
 
 Group Members & Email Addresses:
 
-    Person 1, person1@uky.edu
     Lucy Estep, ljes223@uky.edu
     Keaton Martin, ktma234@uky.edu
+    Kyra Gegner, kmge230@uky.edu
 
 Versioning
 ==========
