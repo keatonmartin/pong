@@ -84,6 +84,8 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
         # =========================================================================================
+
+        # sends client data to server
         update_data = f"{playerPaddleObj.moving}"
         client.send(update_data.encode())
 
