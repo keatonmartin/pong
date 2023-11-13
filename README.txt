@@ -12,6 +12,8 @@ Versioning
 
 Github Link: 
 
+    https://github.com/keatonmartin/pong/tree/master
+
 General Info
 ============
 This file describes how to install/run your program and anything else you think the user should know
@@ -25,6 +27,5 @@ Run the following line to install the required libraries for this project:
 
 Known Bugs
 ==========
-- The server doesn't work because the logic isn't yet written.
-- The client doesn't speak to the server
+- The screen, once the game ends, just freezes
 
