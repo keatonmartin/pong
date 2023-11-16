@@ -8,9 +8,8 @@
 import socket
 import threading
 
-# uncomment if you want to expose over eduroam
-HOST = "10.47.39.0"
-#HOST = "localhost"
+# to expose over eduroam, run ifconfig and change the host to the ip looking like 10.xx.xx.xx
+HOST = "localhost"
 PORT = 12321
 MAX_CONNS = 10  # maximum number of connections supported, must be even
 
