@@ -17,7 +17,7 @@ SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
 # number of seconds to wait before timing out on a blocking operation on a socket, i.e. read/write
-TIMEOUT = 20
+TIMEOUT = 5
 
 # byte buffer size for io
 BUF_SIZE = 128 
@@ -29,11 +29,14 @@ BUF_SIZE = 128
 def handleClient(c1: socket.socket, c2: socket.socket) -> None:
     while True:
         try:
-            # receive from client
+            # send paddle direction to opponent
             state = c1.recv(BUF_SIZE).decode()
+            if len(state) == 0: break # recv returns 0 bytes if client closed
             c2.send(state.encode())
-        except socket.timeout:
-            print(f"Client {clientId} timed out; quitting game.")
+        except socket.TimeoutError:
+            print("Socket timed out. Check connection.")
+            break
+    print("Closing client...")
     c1.close()
 
 # Author: Keaton Martin
@@ -42,9 +45,6 @@ def handleClient(c1: socket.socket, c2: socket.socket) -> None:
 # Pre: handleGame expects two live users at the end of sockets c1 and c2
 # Post: After handleGame finishes, the socket connections to c1 and c2 are closed.
 def createGame(c1: socket.socket, c2: socket.socket) -> None:
-    # set timeouts on sockets
-    c1.settimeout(TIMEOUT)
-    c2.settimeout(TIMEOUT)
 
     # send paddle identities to clients
     c1.send(f"left {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
@@ -70,7 +70,7 @@ def main():
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((HOST, PORT))
     server.listen(MAX_CONNS)
-    clientId = 0
+    socket.setdefaulttimeout(TIMEOUT)
     while True:
         # attempt to pair two incoming clients
         clientSocket1, _ = server.accept()

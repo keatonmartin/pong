@@ -158,7 +158,9 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
             time.sleep(3) # wait three seconds then quit game
             break
 
-        clock.tick(60) 
+        clock.tick(60)
+    
+    client.close()
         
 
 # This is where you will connect to the server to get the info required to call the game loop.  Mainly
