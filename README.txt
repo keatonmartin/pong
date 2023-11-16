@@ -12,7 +12,7 @@ Versioning
 
 Github Link: 
 
-    https://github.com/keatonmartin/pong/tree/master
+    https://github.com/keatonmartin/pong/
 
 General Info
 ============
