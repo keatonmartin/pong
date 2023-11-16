@@ -9,7 +9,7 @@ import pygame
 import tkinter as tk
 import sys
 import socket
-
+import time
 from assets.code.helperCode import *
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
@@ -58,7 +58,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
     rScore = 0
 
     playerPaddleObj.moving = "none"
-
+    gameOver = False
     while True:
         # Wiping the screen
         screen.fill((0,0,0))
@@ -108,6 +108,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
             textRect = textSurface.get_rect()
             textRect.center = ((screenWidth/2), screenHeight/2)
             winMessage = screen.blit(textSurface, textRect)
+            gameOver = True
         else:
 
             # ==== Ball Logic =====================================================================
@@ -150,9 +151,15 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         pygame.draw.rect(screen, WHITE, topWall)
         pygame.draw.rect(screen, WHITE, bottomWall)
         scoreRect = updateScore(lScore, rScore, screen, WHITE, scoreFont)
+        
         pygame.display.flip()
-        clock.tick(60) 
 
+        if gameOver:
+            time.sleep(3) # wait three seconds then quit game
+            break
+
+        clock.tick(60) 
+        
 
 # This is where you will connect to the server to get the info required to call the game loop.  Mainly
 # the screen width, height and player paddle (either "left" or "right")
@@ -182,14 +189,10 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
         client.close()
         return
 
-    # If you have messages you'd like to show the user use the errorLabel widget like so
-    errorLabel.config(text=f"Some update text. You input: IP: {ip}, Port: {port}")
-    # You may or may not need to call this, depending on how many times you update the label
     errorLabel.update()     
 
     # Close this window and start the game with the info passed to you from the server
     app.withdraw()     # Hides the window (we'll kill it later)
-    # playGame(screenWidth, screenHeight, ("left"|"right"), client)  # User will be either left or right paddle
     playGame(screenWidth, screenHeight, playerPaddle, client)
     app.quit()         # Kills the window
 
@@ -224,9 +227,4 @@ def startScreen():
     app.mainloop()
 
 if __name__ == "__main__":
-    startScreen()
-    
-    # Uncomment the line below if you want to play the game without a server to see how it should work
-    # the startScreen() function should call playGame with the arguments given to it by the server this is
-    # here for demo purposes only
-    # playGame(640, 480,"left",socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+    startScreen() 

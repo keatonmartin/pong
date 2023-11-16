@@ -41,7 +41,7 @@ def handleClient(c1: socket.socket, c2: socket.socket) -> None:
 # two clients by spawning a handleClient thread for each client
 # Pre: handleGame expects two live users at the end of sockets c1 and c2
 # Post: After handleGame finishes, the socket connections to c1 and c2 are closed.
-def createGame(c1: socket.socket, c2: socket.socket, c1Id: int, c2Id: int) -> None:
+def createGame(c1: socket.socket, c2: socket.socket) -> None:
     # set timeouts on sockets
     c1.settimeout(TIMEOUT)
     c2.settimeout(TIMEOUT)
@@ -79,7 +79,7 @@ def main():
         print("Player two has connected.")
      
         gameThread = threading.Thread(
-            target=handleGame, args=(clientSocket1, clientSocket2)
+            target=createGame, args=(clientSocket1, clientSocket2)
         )
         gameThread.start()
 
