@@ -9,10 +9,10 @@ import socket
 import threading
 
 # uncomment if you want to expose over eduroam
-#HOST = "10.47.210.246"
-HOST = "localhost"
+HOST = "10.47.39.0"
+#HOST = "localhost"
 PORT = 12321
-MAX_CONNS = 10  # maximum number of connections supported, should be even probably
+MAX_CONNS = 10  # maximum number of connections supported, must be even
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
@@ -23,12 +23,26 @@ TIMEOUT = 20
 # byte buffer size for io
 BUF_SIZE = 128 
 
+# Author: Keaton Martin
+# handleClient represents one end of the bidirectional exchange of information between clients
+# Pre: handleGame expects c1 to be the socket of a player, and c2 to be the socket of the player's opponent
+# Post: After handleGame finishes, the socket connection to c1 is closed.
+def handleClient(c1: socket.socket, c2: socket.socket) -> None:
+    while True:
+        try:
+            # receive from client
+            state = c1.recv(BUF_SIZE).decode()
+            c2.send(state.encode())
+        except socket.timeout:
+            print(f"Client {clientId} timed out; quitting game.")
+    c1.close()
 
 # Author: Keaton Martin
-# Purpose: handleGame facilitates the exchange of game information between two clients playing together
+# Purpose: handleGame sets up the bidirectional exchange of game state between 
+# two clients by spawning a handleClient thread for each client
 # Pre: handleGame expects two live users at the end of sockets c1 and c2
 # Post: After handleGame finishes, the socket connections to c1 and c2 are closed.
-def handleGame(c1: socket.socket, c2: socket.socket) -> None:
+def createGame(c1: socket.socket, c2: socket.socket, c1Id: int, c2Id: int) -> None:
     # set timeouts on sockets
     c1.settimeout(TIMEOUT)
     c2.settimeout(TIMEOUT)
@@ -37,42 +51,34 @@ def handleGame(c1: socket.socket, c2: socket.socket) -> None:
     c1.send(f"left {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
     c2.send(f"right {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
 
-    # start game
-    while True:
-        try:
-            # exchange paddle, score, and ball information
-            c1state = c1.recv(BUF_SIZE).decode()
-            c2state = c2.recv(BUF_SIZE).decode()
+    # spawn client threads
+    clientThread1 = threading.Thread(
+            target=handleClient, args=(c1, c2)
+    )
+    clientThread2 = threading.Thread(
+            target=handleClient, args=(c2, c1)
+    )
+    clientThread1.start()
+    clientThread2.start()
 
-            c1.send(c2state.encode())
-            c2.send(c1state.encode())
-
-            # assert sync vars are the same
-            c1sync = c1.recv(BUF_SIZE).decode()
-            c2sync = c2.recv(BUF_SIZE).decode()
-            print(f"c1: {c1sync} - c2: {c2sync}")
-
-        except socket.timeout:
-            print("Socket timed out; quitting game.")
-            break
-    # close client connections
-    c1.close()
-    c2.close()
-
-
+# Author: Keaton Martin
+# Purpose: main sets up the server socket and
+# attempts to pair two clients and then spawns handleGame to perform game setup
+# Pre: n/a
+# Post: main shouldn't exit the while loop
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((HOST, PORT))
     server.listen(MAX_CONNS)
-
+    clientId = 0
     while True:
         # attempt to pair two incoming clients
         clientSocket1, _ = server.accept()
         print("Player one has connected.")
         clientSocket2, _ = server.accept()
         print("Player two has connected.")
-
+     
         gameThread = threading.Thread(
             target=handleGame, args=(clientSocket1, clientSocket2)
         )
