@@ -77,7 +77,9 @@ def main():
         print("Player one has connected.")
         clientSocket2, _ = server.accept()
         print("Player two has connected.")
-     
+        
+        # Although the logic in createGame is suitable to be contained in this while loop,
+        # we spawn a separate thread so server can immediately accept and pair more connections
         gameThread = threading.Thread(
             target=createGame, args=(clientSocket1, clientSocket2)
         )
