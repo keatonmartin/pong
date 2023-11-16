@@ -40,27 +40,6 @@ def handleClient(c1: socket.socket, c2: socket.socket) -> None:
     c1.close()
 
 # Author: Keaton Martin
-# Purpose: handleGame sets up the bidirectional exchange of game state between 
-# two clients by spawning a handleClient thread for each client
-# Pre: handleGame expects two live users at the end of sockets c1 and c2
-# Post: After handleGame finishes, the socket connections to c1 and c2 are closed.
-def createGame(c1: socket.socket, c2: socket.socket) -> None:
-
-    # send paddle identities to clients
-    c1.send(f"left {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
-    c2.send(f"right {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
-
-    # spawn client threads
-    clientThread1 = threading.Thread(
-            target=handleClient, args=(c1, c2)
-    )
-    clientThread2 = threading.Thread(
-            target=handleClient, args=(c2, c1)
-    )
-    clientThread1.start()
-    clientThread2.start()
-
-# Author: Keaton Martin
 # Purpose: main sets up the server socket and
 # attempts to pair two clients and then spawns handleGame to perform game setup
 # Pre: n/a
@@ -73,18 +52,24 @@ def main():
     socket.setdefaulttimeout(TIMEOUT)
     while True:
         # attempt to pair two incoming clients
-        clientSocket1, _ = server.accept()
+        c1, _ = server.accept()
         print("Player one has connected.")
-        clientSocket2, _ = server.accept()
+        c2, _ = server.accept()
         print("Player two has connected.")
-        
-        # Although the logic in createGame is suitable to be contained in this while loop,
-        # we spawn a separate thread so server can immediately accept and pair more connections
-        gameThread = threading.Thread(
-            target=createGame, args=(clientSocket1, clientSocket2)
+        # send paddle identities to clients
+        c1.send(f"left {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
+        c2.send(f"right {SCREEN_WIDTH} {SCREEN_HEIGHT}".encode())
+
+        # spawn client threads
+        clientThread1 = threading.Thread(
+            target=handleClient, args=(c1, c2)
         )
-        gameThread.start()
+        clientThread2 = threading.Thread(
+            target=handleClient, args=(c2, c1)
+        )
+        clientThread1.start()
+        clientThread2.start()
 
-
+             
 if __name__ == "__main__":
     main()
