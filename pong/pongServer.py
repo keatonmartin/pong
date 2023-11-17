@@ -9,9 +9,9 @@ import socket
 import threading
 
 # to expose over eduroam, run ifconfig and change the host to the ip looking like 10.xx.xx.xx
-HOST = "localhost"
+HOST = "10.47.25.82"
 PORT = 12321
-MAX_CONNS = 10  # maximum number of connections supported, must be even
+MAX_CONNS = 10  # maximum number of connections supported, should be even
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
@@ -41,7 +41,7 @@ def handleClient(c1: socket.socket, c2: socket.socket) -> None:
 
 # Author: Keaton Martin
 # Purpose: main sets up the server socket and
-# attempts to pair two clients and then spawns handleGame to perform game setup
+# attempts to pair two clients and then spawns threads to handle the clients
 # Pre: n/a
 # Post: main shouldn't exit the while loop
 def main():
